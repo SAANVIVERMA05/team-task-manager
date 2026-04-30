@@ -52,5 +52,14 @@ router.post("/login", async (req, res) => {
         res.status(500).send("Server error");
     }
 });
+// GET ALL USERS (For assigning tasks & projects)
+router.get("/users", async (req, res) => {
+    try {
+        const users = await User.find().select("-password");
+        res.json(users);
+    } catch (err) {
+        res.status(500).send("Server error");
+    }
+});
 
 module.exports = router;

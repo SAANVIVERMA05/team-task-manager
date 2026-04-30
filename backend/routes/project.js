@@ -25,8 +25,23 @@ router.post("/", auth, admin, async (req, res) => {
 // GET ALL PROJECTS (Logged-in users)
 router.get("/", auth, async (req, res) => {
     try {
-        const projects = await Project.find().populate("members", "name email");
+        const query = req.user.role === "admin" ? {} : { members: req.user.id };
+        const projects = await Project.find(query).populate("members", "name email");
         res.json(projects);
+    } catch (err) {
+        res.status(500).send("Server error");
+    }
+});
+
+// UPDATE PROJECT MEMBERS (Admin only)
+router.put("/:id/members", auth, admin, async (req, res) => {
+    try {
+        const project = await Project.findByIdAndUpdate(
+            req.params.id,
+            { members: req.body.members },
+            { new: true }
+        ).populate("members", "name email");
+        res.json(project);
     } catch (err) {
         res.status(500).send("Server error");
     }

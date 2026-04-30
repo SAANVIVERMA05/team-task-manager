@@ -19,7 +19,8 @@ router.post("/", auth, admin, async (req, res) => {
 // GET TASKS (for logged-in users)
 router.get("/", auth, async (req, res) => {
     try {
-        const tasks = await Task.find()
+        const query = req.user.role === "admin" ? {} : { assignedTo: req.user.id };
+        const tasks = await Task.find(query)
             .populate("assignedTo", "name email")
             .populate("project", "name");
 
